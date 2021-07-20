@@ -1,0 +1,186 @@
+rbac:
+  create: false
+replicas: 1
+
+autoscaling:
+  enabled: false
+
+podDisruptionBudget: {}
+
+deploymentStrategy:
+  type: RollingUpdate
+
+readinessProbe:
+  httpGet:
+    path: /api/health
+    port: 3000
+
+livenessProbe:
+  httpGet:
+    path: /api/health
+    port: 3000
+  initialDelaySeconds: 60
+  timeoutSeconds: 30
+  failureThreshold: 10
+
+image:
+  repository: grafana/grafana
+  tag: 8.0.5
+  sha: ""
+  pullPolicy: IfNotPresent
+
+testFramework:
+  enabled: false
+
+securityContext:
+  runAsUser: 472
+  runAsGroup: 472
+  fsGroup: 472
+
+containerSecurityContext:
+  {}
+
+extraConfigmapMounts: []
+
+
+extraEmptyDirMounts: []
+
+extraLabels: {}
+
+
+podPortName: grafana
+
+
+service:
+  enabled: true
+  type: ClusterIP
+  port: 80
+  targetPort: 3000
+    # targetPort: 4181 To be used with a proxy extraContainer
+  annotations: {}
+  labels: {}
+  portName: service
+
+serviceMonitor:
+  enabled: false
+
+
+extraExposePorts: []
+ # - name: keycloak
+ #   port: 8080
+ #   targetPort: 8080
+ #   type: ClusterIP
+
+
+hostAliases: []
+
+
+ingress:
+  enabled: true
+  annotations:
+    nginx.ingress.kubernetes.io/configuration-snippet: "rewrite ^(/grafana)$ $1/ permanent;
+      \n"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+  labels: {}
+  path: /(.*)
+
+  # pathType is only for k8s >= 1.1=
+  pathType: Prefix
+
+  hosts:
+    - grafana.str.vbin.in
+
+
+resources:
+ limits:
+   cpu: 100m
+   memory: 128Mi
+ requests:
+   cpu: 100m
+   memory: 128Mi
+
+
+## Enable persistence using Persistent Volume Claims
+## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+##
+persistence:
+  type: pvc
+  enabled: true
+  storageClassName: nfs-client
+  accessModes:
+    - ReadWriteOnce
+  size: 5Gi
+  # annotations: {}
+  finalizers:
+    - kubernetes.io/pvc-protection
+  # selectorLabels: {}
+  # subPath: ""
+  # existingClaim:
+
+  ## If persistence is not enabled, this allows to mount the
+  ## local storage in-memory to improve performance
+  ##
+  inMemory:
+    enabled: false
+    ## The maximum usage on memory medium EmptyDir would be
+    ## the minimum value between the SizeLimit specified
+    ## here and the sum of memory limits of all containers in a pod
+    ##
+    # sizeLimit: 300Mi
+
+
+
+# Administrator credentials when not using an existing secret (see below)
+adminUser: admin
+adminPassword: admin123
+
+
+plugins:
+  - digrich-bubblechart-panel
+  - grafana-clock-panel
+
+## Configure grafana datasources
+## ref: http://docs.grafana.org/administration/provisioning/#datasources
+##
+
+## Configure notifiers
+## ref: http://docs.grafana.org/administration/provisioning/#alert-notification-channels
+##
+notifiers: {}
+
+
+## Grafana's primary configuration
+## NOTE: values in map will be converted to ini format
+## ref: http://docs.grafana.org/installation/configuration/
+##
+grafana.ini:
+  paths:
+    data: /var/lib/grafana/
+    logs: /var/log/grafana
+    plugins: /var/lib/grafana/plugins
+    provisioning: /etc/grafana/provisioning
+  analytics:
+    check_for_updates: true
+  log:
+    mode: console
+  grafana_net:
+    url: https://grafana.net
+## grafana Authentication can be enabled with the following values on grafana.ini
+ # server:
+      # The full public facing url you use in browser, used for redirects and emails
+ #    root_url:
+ # https://grafana.com/docs/grafana/latest/auth/github/#enable-github-in-grafana
+
+
+## Override the deployment namespace
+##
+namespaceOverride: "grafana"
+
+## Number of old ReplicaSets to retain
+##
+revisionHistoryLimit: 10
+
+## Add a seperate remote image renderer deployment/service
+imageRenderer:
+  # Enable the image-renderer deployment & service
+  enabled: false
