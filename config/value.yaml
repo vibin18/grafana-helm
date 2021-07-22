@@ -204,7 +204,6 @@ extraInitContainers:
 #     volumeMounts:
 #     - name: plugins
 #       mountPath: "/plugins"
-
-extraVolumeMounts:
+extraContainerVolumes:
   - name: plugins
     emptyDir: {}
