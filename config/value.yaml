@@ -160,7 +160,7 @@ grafana.ini:
   paths:
     data: /var/lib/grafana/
     logs: /var/log/grafana
-    plugins: /opt/grafana
+    plugins: /plugins
     provisioning: /etc/grafana/provisioning
   analytics:
     check_for_updates: true
@@ -188,12 +188,23 @@ imageRenderer:
   # Enable the image-renderer deployment & service
   enabled: false
 
-extraInitContainers: 
+extraInitContainers:
+  - name: busybox-volume-creator
+    image: busybox
+    command: ['sh', '-c', 'chown -R 1024:users /plugins']
+    volumeMounts:
+    - name: plugins
+      mountPath: "/plugins" 
 
-## Enable an Specify container in extraContainers. This is meant to allow adding an authentication proxy to a grafana pod
-- extraContainers: |
-    - name: busybox
-      image:
-        repository: busybox
-        tag: "1.31.1"
-        command: ['sh', '-c', 'mkdir /opt/grafana && chown -R 1024:users /opt/grafana']
+# ## Enable an Specify container in extraContainers. This is meant to allow adding an authentication proxy to a grafana pod
+# extraContainers: |
+#   - name: busybox
+#     image:busybox
+#     command: ['sh', '-c', 'chown -R 1024:users /plugins']
+#     volumeMounts:
+#     - name: plugins
+#       mountPath: "/plugins"
+
+extraVolumeMounts:
+  - name: plugins
+    emptyDir: {}
