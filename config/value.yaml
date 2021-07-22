@@ -140,6 +140,7 @@ adminPassword: admin123
 plugins:
   - digrich-bubblechart-panel
   - grafana-clock-panel
+  - petrslavotinek-carpetplot-panel
 
 ## Configure grafana datasources
 ## ref: http://docs.grafana.org/administration/provisioning/#datasources
@@ -159,7 +160,7 @@ grafana.ini:
   paths:
     data: /var/lib/grafana/
     logs: /var/log/grafana
-    plugins: /var/lib/grafana/plugins
+    plugins: /opt/grafana
     provisioning: /etc/grafana/provisioning
   analytics:
     check_for_updates: true
@@ -186,3 +187,13 @@ revisionHistoryLimit: 10
 imageRenderer:
   # Enable the image-renderer deployment & service
   enabled: false
+
+extraInitContainers: 
+
+## Enable an Specify container in extraContainers. This is meant to allow adding an authentication proxy to a grafana pod
+- extraContainers: |
+    - name: busybox
+      image:
+        repository: busybox
+        tag: "1.31.1"
+        command: ['sh', '-c', 'mkdir /opt/grafana && chown -R 1024:users /opt/grafana']
