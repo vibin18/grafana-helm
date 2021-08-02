@@ -188,22 +188,7 @@ imageRenderer:
   # Enable the image-renderer deployment & service
   enabled: false
 
-# extraInitContainers:
-#   - name: busybox-volume-creator
-#     image: busybox
-#     command: ['sh', '-c', 'chown -R 1024:users /plugins']
-#     volumeMounts:
-#     - name: plugins
-#       mountPath: "/plugins" 
 
-# ## Enable an Specify container in extraContainers. This is meant to allow adding an authentication proxy to a grafana pod
-# extraContainers: |
-#   - name: busybox
-#     image:busybox
-#     command: ['sh', '-c', 'chown -R 1024:users /plugins']
-#     volumeMounts:
-#     - name: plugins
-#       mountPath: "/plugins"
 
 
 extraVolumeMounts:
