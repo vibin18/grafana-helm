@@ -189,13 +189,11 @@ imageRenderer:
   enabled: false
 
 
-
-
 extraVolumeMounts:
   - name: plugins
     mountPath: /plugins
     readOnly: false
 
-extraContainerVolumes:
-  - name: plugins
-    emptyDir: {}
+# extraContainerVolumes:
+#   - name: plugins
+#     emptyDir: {}
